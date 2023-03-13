@@ -176,7 +176,7 @@ namespace Games
             nextState = GetNextState(currentState, action, possibleStates, out var playerI, out var playerJ);
 
             int countProperlyPlacedCrates = 0;
-            //TODO: Attention aux height et width peut etre mal set ou inversés
+           
             for (int i = 0; i < height; ++i) {
                 for (int j = 0; j < width; ++j)
                 {
@@ -252,7 +252,7 @@ namespace Games
                                 }
                                 nextState.grid[i][j] = wasAnArrival ? layerArrival : layerGround;
                                 nextState.grid[playerNewI][playerNewJ] = layerPlayer;
-                                //TODO: Peut etre inverser Item2 et Item1
+                                
                                 nextState.grid[crateNewPos.Item1][crateNewPos.Item2] = layerCrate;
                                 return possibleStates.Find(state => state.Equals(nextState));
                             }
