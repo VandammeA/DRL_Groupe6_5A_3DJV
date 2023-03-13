@@ -119,7 +119,7 @@ namespace Games
 
         private List<int[][]> GenerateAllPossibleStates(List<int[][]> previousGrids, int remainingcrates, int gridWidth, int gridHeight)
         {
-            //remaining crates 1
+            
             if (remainingcrates < 0) return previousGrids;
 
             List<int[][]> newGrid = new List<int[][]>();
@@ -131,7 +131,7 @@ namespace Games
                         int layer = grid[i][j];
                         if (layer == layerArrival || layer == layerGround) {
                             grid[i][j] = remainingcrates == 0 ? layerPlayer : layerCrate;
-                            newGrid.Add(grid.CloneGrid());  // just a copy
+                            newGrid.Add(grid.CloneGrid()); 
                             grid[i][j] = layer;
                         }
                     }
@@ -147,22 +147,22 @@ namespace Games
         public override float GetReward(int[][] currentState, int[][] nextState)
         {
             float reward = 0f;
-            // Compare each cell in the current and next state
+            // compare chaque cell en fonction de la state
             for (int i = 0; i < currentState.Length; i++)
             {
                 for (int j = 0; j < currentState[0].Length; j++)
                 {
                     if (currentState[i][j] != nextState[i][j])
                     {
-                        // If the cell has changed, add/subtract a reward
+                        // si la cell a changé attribue une reward
                         if (nextState[i][j] == 0) 
                         {
-                            // If the cell has become empty, subtract a reward
+                            
                             reward -= 0.1f;
                         }
                         else if (nextState[i][j] == 1)
                         {
-                            // If the cell has become occupied, add a reward
+                            
                             reward += 0.5f;
                         }
                     }
@@ -217,7 +217,7 @@ namespace Games
                         playerNewJ = newPos.Item2;
 
                         playerDestination = nextState.grid[playerNewI][playerNewJ];
-                        //SI LE JOUEUR SE DIRIGE VERS UNE CASE VIDE
+                        //si le joueur va vers une case vude
                         if (playerDestination == layerGround || playerDestination == layerArrival) {
                             bool wasAnArrival = false;
                             foreach (var arrival in arrivalPositions)
@@ -232,13 +232,13 @@ namespace Games
                             nextState.grid[playerNewI][playerNewJ] = layerPlayer;
                             return possibleStates.Find(state => state.Equals(nextState));
                         }
-                        //LE JOUEUR SE DIRIGE VERS UNE CAISSE
+                        //si le joueur va vers une caisse
                         if (playerDestination == layerCrate) {
                             (int, int) crateNewPos = MovePosition(playerNewI, playerNewJ, action, width, height);
                             int crateNewPosI = crateNewPos.Item1;
                             int crateNewPosJ = crateNewPos.Item2;
                             int crateDestination = nextState.grid[crateNewPosI][crateNewPosJ];
-                            //si la crate est poussée vers une case vide
+                            //si la caisse est poussée vers une case vide
                             if (crateDestination == layerGround || crateDestination == layerArrival)
                             {
                                 bool wasAnArrival = false;

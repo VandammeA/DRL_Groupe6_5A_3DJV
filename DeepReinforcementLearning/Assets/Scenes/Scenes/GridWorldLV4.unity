@@ -4466,7 +4466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aefb44cea9974da4a89143efeb302fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  algorithm: 0
+  algorithm: 4
   player: {fileID: 3251571419695672155}
   groundPlane: {fileID: 2091746476772270645}
   arrowsManager: {fileID: 1203668195}

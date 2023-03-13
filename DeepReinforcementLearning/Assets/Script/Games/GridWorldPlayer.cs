@@ -12,24 +12,32 @@ namespace Games {
             GameManager.Instance.stateDelegate = this;
         }
 
+        // Fonction pour déplacer le joueur
         public override void Move(Vector2 direction)
         {
+            // Calculer la position de destination en ajoutant le vecteur de direction au vecteur de position actuel et multiplié par la taille de grille
             Vector3 destination = transform.position + (direction.x * Vector3.right + direction.y * Vector3.up) * gridSize;
+            // Lancer un rayon pour détecter les objets dans le chemin
             if (Physics.Raycast(destination + Vector3.back * 5, Vector3.forward, out var hit, 10))
             {
+                // Vérifier si l'objet touché est un objet où le joueur peut marcher
                 if (walkableMask == (walkableMask | (1 << hit.collider.gameObject.layer)))
                 {
+                    // Déplacer le joueur
                     transform.position = destination;
                 }
             }
         }
 
+        // Fonction pour obtenir tous les états possibles
         public override int[][][] GetAllPossibleStates(GameGrid grid) {
+            // Récupérer l'ID des couches
             int layerPlayer = Layers.IntValue("Player");
             int layerGround = Layers.IntValue("Ground");
-            
+        
             var result = new List<int[][]>();
 
+            // Copier la grille et remplacer la position du joueur par la position de terrain
             var cleanedGrid = grid.gridState.grid.CloneGrid();
             int gridHeight = cleanedGrid.Length;
             int gridWidth = cleanedGrid[0].Length;
@@ -38,13 +46,13 @@ namespace Games {
                     if (row[j] == layerPlayer) row[j] = layerGround;
                 }
             }
-            
-            // select all possible states
+        
+            // Sélectionner tous les états possibles
             for (int i = 0; i < gridHeight; ++i) {
                 for (int j = 0; j < gridWidth; ++j) {
                     if (cleanedGrid[i][j] == layerGround) {
                         cleanedGrid[i][j] = layerPlayer;
-                        result.Add(cleanedGrid.CloneGrid());  // just a copy
+                        result.Add(cleanedGrid.CloneGrid());  
                         cleanedGrid[i][j] = layerGround;
                     }
                 }
@@ -74,10 +82,10 @@ namespace Games {
         }
         public override float GetReward(int[][] prevState, int[][] nextState)
         {
-            // Calculate the reward based on the difference between the previous and next state
+            // compare chaque cell en fonction de la state
             int layerArrival = Layers.IntValue("Arrival");
-            int[][] currentGrid = nextState; // The grid after the agent has taken an action
-            int[][] previousGrid = prevState; // The grid before the agent has taken an action
+            int[][] currentGrid = nextState; 
+            int[][] previousGrid = prevState;
 
             int playerI = -1;
             int playerJ = -1;
@@ -94,13 +102,13 @@ namespace Games {
                 }
             }
 
-            // Check if the player has reached the goal
+            // attribue reward
             if (currentGrid[playerI][playerJ] == layerArrival)
             {
-                return 1.0f; // The agent receives a reward of 1 if it reaches the goal
+                return 1.0f; 
             }
 
-            return 0.0f; // The agent receives a reward of 0 for all other actions
+            return 0.0f; 
         }
         
 

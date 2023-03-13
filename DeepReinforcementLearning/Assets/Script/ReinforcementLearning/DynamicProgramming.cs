@@ -6,14 +6,18 @@ using Script.ReinforcementLearning.Common;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+
 namespace ReinforcementLearning {
     public static class DynamicProgramming {
+        //------------------------------------------------------------------------------PolicyIteration-------------------------------------------------------------------------
+        // Méthode d'itération de politique pour trouver une politique optimale
         public static List<Movement> PolicyIteration(AiAgent agent, GameGrid grid) {
-            // init
+            // Récupérer tous les états possibles de la grille et les stocker dans la variable 
             var possibleGridStates = agent.GetAllPossibleStates(grid);
-            //Generation des etats de départ avec direction random
+            // Créer une liste pour stocker tous les états possibles
             var possibleStates = new List<GridState>();
             foreach (var possibleState in possibleGridStates) {
+                // Choisir une action aléatoire pour chaque état
                 int random = Random.Range(0, 4);
                 GridState state = new GridState(possibleState) {
                     BestAction = (Movement)random,
@@ -22,12 +26,14 @@ namespace ReinforcementLearning {
                 state.SetArrow();
                 possibleStates.Add(state);
             }
-
+            // Facteur de dévaluation et seuil de convergence
             float gamma = 0.9f;
             float theta = 0.25f;
-
+            
+            // Évaluation de politique
             PolicyEvaluation(agent, grid.gridState, possibleStates, gamma, theta);
 
+            // Recherche de la meilleure politique
             GridState nextState = grid.gridState;
             List<Movement> policy = new List<Movement>();
             int maxIterations = 100;
@@ -41,11 +47,13 @@ namespace ReinforcementLearning {
                 if (tmp.Equals(nextState)) break;
             } while (nextState != null && maxIterations >= 0);
             
+            // Afficher les valeurs des états possibles et les actions optimales associées
             string possibleStatesVals = "Values : ";
             foreach (var state in possibleStates) {
                 possibleStatesVals += state + " -> " + state.value + " ; best action" + state.BestAction + "\n";
             }
 
+            // Afficher la politique
             //Debug.Log(possibleStatesVals);
             string policyLog = "Policy (" + policy.Count + ") :";
             foreach (var move in policy) {
@@ -69,27 +77,34 @@ namespace ReinforcementLearning {
             }
 
             
-
+            // Retourner la politique optimale
             return policy;
         }
-
+        
+        
+        // Appliquer l'algorithme d'évaluation de la politique pour obtenir les valeurs des états
         private static void PolicyEvaluation(AiAgent agent, GridState firstState, List<GridState> possibleStates, float gamma, float theta) {
             float delta;
             do {
                 delta = 0;
+                // Pour chaque état possible dans la liste
                 for (var index = 0; index < possibleStates.Count; index++) {
+                    // Si l'état est un état final, passer à l'état suivant
                     if (agent.IsFinalState(possibleStates[index].grid, firstState.grid)) continue;
                     var temp = possibleStates[index].value;
+                    // Mettre à jour la valeur de l'état en utilisant la fonction de récompense et la valeur de l'état suivant
                     possibleStates[index].value =
                         GameManager.Instance.stateDelegate.GetReward(possibleStates[index], possibleStates[index].BestAction,
                             possibleStates, out var nextState) + gamma * nextState.value;
                     delta = Mathf.Max(delta, Mathf.Abs(temp - possibleStates[index].value));
                 }
+                // Répéter tant que la différence maximale n'a pas atteint le seuil de convergence
             } while (delta > theta);
-
+            // Amélioration de la politique
             PolicyImprovement(agent, firstState, possibleStates, gamma, theta);
         }
 
+        //Amélioration de la politique de l'agent en fonction de la valeur des états
         private static void PolicyImprovement(AiAgent agent, GridState firstState, List<GridState> possibleStates, float gamma, float theta) {
             bool policyStable = true;
 
@@ -117,6 +132,8 @@ namespace ReinforcementLearning {
             PolicyEvaluation(agent, firstState, possibleStates, gamma, theta);
         }
 
+        //------------------------------------------------------------------------------ValueIteration-------------------------------------------------------------------------
+        //Calcule la politique optimale d'un agent AI pour une grille de jeu donnée
         public static List<Movement> ValueIteration(AiAgent agent, GameGrid grid) {
             // init
             var possibleGridStates = agent.GetAllPossibleStates(grid);
@@ -131,7 +148,8 @@ namespace ReinforcementLearning {
 
             float gamma = 0.9f; // facteur de dévaluation
             float delta;
-            float theta = 0.01f;
+            float theta = 0.01f;// seuil de convergence
+
 
             int maxIterations = 100;
             do {
@@ -160,9 +178,9 @@ namespace ReinforcementLearning {
 
                     delta = Mathf.Max(delta, Mathf.Abs(temp - state.value));
                 }
-            } while (delta > theta && maxIterations >= 0); // until delta < theta
+            } while (delta > theta && maxIterations >= 0); 
 
-            // build end policy
+            
             List<Movement> policy = new List<Movement>();
             var nextState = grid.gridState;
 

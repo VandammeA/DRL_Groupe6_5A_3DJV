@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 
 public enum SolvingAlgorithm
 {
-    ValueIteration, PolicyIteration, MonteCarlo,MonteCarloES, Sarsa, QLearning
+    ValueIteration, PolicyIteration,MonteCarloES, Sarsa, QLearning
 }
 public class GameManager : MonoBehaviour {
     private static GameManager _instance;
@@ -59,11 +59,15 @@ public class GameManager : MonoBehaviour {
             case SolvingAlgorithm.PolicyIteration:
                 moves = DynamicProgramming.PolicyIteration(player, gameGrid);
                 break;
-            case SolvingAlgorithm.MonteCarlo:
-                moves = MonteCarlo.FirstVisitMonteCarloPredictionWithExploringStart(player, gameGrid, 100, 100);
-                break;
+
             case SolvingAlgorithm.MonteCarloES:
                 moves = MonteCarloES.MonteCarloControl(player, gameGrid, 100, 100);
+                break;
+            case SolvingAlgorithm.Sarsa:
+                moves = Sarsa.EpsilonGreedy(player, gameGrid, 0.5f, 0.9f,0.1f,1);
+                break;
+            case SolvingAlgorithm.QLearning:
+                moves = QLearning.RunQLearning(player, gameGrid);
                 break;
             default:
                 

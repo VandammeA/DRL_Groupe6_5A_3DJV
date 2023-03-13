@@ -1375,7 +1375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aefb44cea9974da4a89143efeb302fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  algorithm: 1
+  algorithm: 0
   player: {fileID: 1132696585199481776}
   groundPlane: {fileID: 2321119268724478978}
   arrowsManager: {fileID: 794448972252190790}
